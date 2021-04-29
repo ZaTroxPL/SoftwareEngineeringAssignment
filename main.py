@@ -1,16 +1,24 @@
-# This is a sample Python script.
+import Processes
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+exit_application = False
 
+print("Welcome")
+print("In order to view stored data, type in 'display data' command,\n" +
+      "if you wish to see a more detailed view, type in 'display detailed data'")
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+while not exit_application:
+    main_menu_navigation = input("user input: ").lower()
+    if main_menu_navigation == "exit" or main_menu_navigation == "quit":
+        exit_application = True
+    elif main_menu_navigation == "display data":
+        print("display data in the csv file")
+    elif main_menu_navigation == "display detailed data":
+        print("display data with all fields in the csv file")
+    elif main_menu_navigation.startswith("update "):
+        print("update selected record")
+    elif main_menu_navigation == "add new record":
+        print("add new record")
+    elif main_menu_navigation.startswith("remove "):
+        Processes.remove_record(main_menu_navigation)
+    else:
+        print("user input not recognised, please try again")
