@@ -1,0 +1,9 @@
+{
+  "command_names": {
+    "display_data": "data",
+    "display_all_data": "all data",
+    "create": "create",
+    "update": "update",
+    "delete": "delete"
+  }
+}
