@@ -5,5 +5,12 @@
     "create": "create",
     "update": "update",
     "delete": "delete"
-  }
+  },
+  "display_data_fields": [
+    "id",
+    "year",
+    "first_name",
+    "holidays_left",
+    "email"
+  ]
 }
