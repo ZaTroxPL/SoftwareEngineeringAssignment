@@ -31,17 +31,16 @@ while not exit_application:
             "replace the 'id' with an actual id of the record you want to update/delete"
         ]
 
-        # get longest command
         longest_command = 0
 
         for line in help_section:
-            # check if the line is a list
+            # check if line is a list
             if type(line) == type(help_section):
                 if len(line[0]) > longest_command:
                     longest_command = len(line[0])
 
         for line in help_section:
-            # check if the line is a list
+            # check if line is a list
             if type(line) == type(help_section):
                 print(f"{line[0]:<{longest_command + 3}} - {line[1]}")
             else:

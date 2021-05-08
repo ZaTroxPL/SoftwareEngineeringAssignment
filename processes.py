@@ -76,14 +76,14 @@ def display_table(display_data_fields):
 
     # create outline and header for the table
     outline = "+"
-    header_fieldnames = "|"
+    header = "|"
     for column in column_widths:
         # +1 is for the + to have it's own place
         outline += f"-{'-':->{column_widths[column] + 1}}+"
-        header_fieldnames += f" {column:^{column_widths[column]}} |"
+        header += f" {column:^{column_widths[column]}} |"
 
     table.append(outline)
-    table.append(header_fieldnames)
+    table.append(header)
     table.append(outline)
 
     # create rows for the table
