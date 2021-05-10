@@ -1,3 +1,4 @@
+import os.path
 import csv
 
 
@@ -5,9 +6,13 @@ class EmployeeHolidays:
 
     def __init__(self, file_location):
         self.file_location = file_location
+
+        # error handling
+        assert(os.path.isfile(self.file_location)), "Specified file doesn't exist."
+
         with open(file_location, "r", newline="") as csv_read_employee_holidays:
-            self.set_field_names(csv_read_employee_holidays)
-            self.set_records_and_ids(csv_read_employee_holidays)
+            self._set_field_names(csv_read_employee_holidays)
+            self._set_records_and_ids(csv_read_employee_holidays)
 
     def _set_field_names(self, file):
         fieldnames = file.readline().split(",")
@@ -30,7 +35,8 @@ class EmployeeHolidays:
 
         assert(len(records) == len(ids)), "There are duplicate ids"
 
-        self.records = records
+        # sorting the records by their id value
+        self.records = sorted(records, key=lambda record: record["id"])
         self.ids = ids
 
     def set_column_widths(self, display_data_fields):
@@ -65,12 +71,16 @@ class EmployeeHolidays:
             return {"exists": True, "id": record_id}
         return {"exists": False, "id": record_id}
 
-    def display_table(self, display_data_fields, display_specific_records=[]):
+    def display_table(self, display_data_fields, display_specific_records=None):
+
+        # make sure that the display_specific_records list is always empty at the start of the method
+        if display_specific_records is None:
+            display_specific_records = []
 
         fieldnames = self.fieldnames
         records = self.records
         if len(display_specific_records) > 0:
-            records = [record for record in records if record["id"] in display_specific_records]
+            records = display_specific_records
 
         # making sure all provided fields exist
         for field in display_data_fields:
@@ -145,16 +155,51 @@ class EmployeeHolidays:
             print(f"record with the id of '{result['id']}' doesn't exists")
             return
 
+        # create new list of records so that the self.records isn't overwritten
+        records = self.records.copy()
+
         # search for a record with the same id as in the result object, take the 1st time in the list
-        record_to_update = [record for record in self.records if record["id"] == result["id"]][0]
-        self.display_table(self.fieldnames, [record_to_update["id"]])
+        original_record = [record for record in records if record["id"] == result["id"]][0].copy()
+        record_to_update = original_record.copy()
+        self.display_table(self.fieldnames, [record_to_update])
+
+        update_section = [
+            "Please insert the name of the field you want to update.",
+            "Type 'done' to save changes and come back to the main menu.",
+            "You can also type in 'exit' to abort the update operation."
+        ]
+
+        for line in update_section:
+            print(line)
 
         stop_updating = False
 
         while not stop_updating:
-            update_menu_navigation = input("Please insert the name of the field you want to update, " +
-                                           "once you feel like you are done with your changes, type 'done'")
+            update_menu_navigation = input("User Input: ").strip()
 
+            if update_menu_navigation.lower() == "done":
+                # get index of the original record
+                index = self.records.index(original_record)
+                # overwrite the original record at the specified index
+                self.records[index] = record_to_update
+                self.overwrite_file()
+                self.display_table(self.fieldnames)
+                stop_updating = True
+
+            elif update_menu_navigation.lower() == "exit":
+                stop_updating = True
+
+            elif update_menu_navigation.lower() == "id":
+                print("You cannot update the 'id' field")
+
+            elif update_menu_navigation in self.fieldnames:
+                record_to_update[update_menu_navigation] = input(f"{update_menu_navigation}: ")
+                self.display_table(self.fieldnames, [record_to_update])
+
+            else:
+                print("Input not recognised, please enter 'exit' to abort the update operation,"
+                      " 'done' to save the changes and exit the update operation or"
+                      " enter the name of the field you want to update")
 
     def delete_confirmation(self, user_input, command_name):
 
@@ -195,10 +240,3 @@ class EmployeeHolidays:
 
             # overwrite the file
             csv_dictionary_writer.writerows(self.records)
-
-
-"""
-hol = EmployeeHolidays("employee_holidays.csv")
-print(hol.records)
-print(hol.ids)
-"""

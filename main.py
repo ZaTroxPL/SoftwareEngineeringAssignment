@@ -3,7 +3,7 @@ import employee_holidays
 
 
 settings = app_setup.Settings("app_settings.json")
-employee_holidays = employee_holidays.EmployeeHolidays("employee_holidays.csv")
+employee_holidays = employee_holidays.EmployeeHolidays(settings.file_location)
 
 welcome_section = [
     "Welcome",
@@ -16,7 +16,7 @@ for line in welcome_section:
 exit_application = False
 
 while not exit_application:
-    main_menu_navigation = input("user input: ").lower().strip()
+    main_menu_navigation = input("User Input: ").lower().strip()
     if main_menu_navigation == "exit" or main_menu_navigation == "quit":
         exit_application = True
 

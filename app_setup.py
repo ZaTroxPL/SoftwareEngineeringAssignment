@@ -22,3 +22,6 @@ class Settings:
                 data_fields[i] = str(data_fields[i]).strip()
 
             self.display_data_fields = data_fields
+
+            # sanitize the setting by converting to str()
+            self.file_location = str(loaded_file["file_location"])
