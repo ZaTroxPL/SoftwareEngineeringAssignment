@@ -1,8 +1,9 @@
 import app_setup
-import processes
+import employee_holidays
 
 
 settings = app_setup.Settings("app_settings.json")
+employee_holidays = employee_holidays.EmployeeHolidays("employee_holidays.csv")
 
 welcome_section = [
     "Welcome",
@@ -51,19 +52,19 @@ while not exit_application:
         print("settings have been reloaded")
 
     elif main_menu_navigation == f"{settings.command_names['display_data']}":
-        processes.display_table(settings.display_data_fields)
+        employee_holidays.display_table(settings.display_data_fields)
 
     elif main_menu_navigation == f"{settings.command_names['display_all_data']}":
-        processes.display_full_table()
+        employee_holidays.display_table(employee_holidays.fieldnames)
 
     elif main_menu_navigation == f"{settings.command_names['create']}":
-        print("add new record")
+        employee_holidays.create_record()
 
     elif main_menu_navigation.startswith(f"{settings.command_names['update']}"):
-        print("update selected record")
+        employee_holidays.update_record(main_menu_navigation, settings.command_names['update'])
 
     elif main_menu_navigation.startswith(f"{settings.command_names['delete']}"):
-        processes.delete_process(main_menu_navigation, settings.command_names['delete'])
+        employee_holidays.delete_confirmation(main_menu_navigation, settings.command_names['delete'])
 
     else:
         print("user input not recognised, please try again or type 'help' to see a list of available commands")

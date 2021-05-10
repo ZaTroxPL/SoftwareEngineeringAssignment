@@ -12,5 +12,6 @@
     "first_name",
     "holidays_left",
     "email"
-  ]
+  ],
+  "file_location": "employee_holidays.csv"
 }
