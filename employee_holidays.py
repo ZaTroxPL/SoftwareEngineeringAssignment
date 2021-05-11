@@ -14,13 +14,13 @@ class EmployeeHolidays:
             self._set_field_names(csv_read_employee_holidays)
             self._set_records_and_ids(csv_read_employee_holidays)
 
-    def _set_field_names(self, file):
-        fieldnames = file.readline().split(",")
+    def _set_field_names(self, csv_read_employee_holidays):
+        fieldnames = csv_read_employee_holidays.readline().split(",")
         for value in range(0, len(fieldnames)):
             fieldnames[value] = fieldnames[value].strip()
         self.fieldnames = fieldnames
         # reset the file to it's original position
-        file.seek(0)
+        csv_read_employee_holidays.seek(0)
 
     def _set_records_and_ids(self, csv_read_employee_holidays):
 
