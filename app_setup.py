@@ -1,9 +1,14 @@
+import os.path
 import json
 
 
-class Settings:
+class Setting:
 
     def __init__(self, setting_file_location):
+
+        # error handling
+        assert (os.path.isfile(setting_file_location)), "Specified file doesn't exist."
+
         with open(setting_file_location, "r") as json_file:
             json_loaded_file = (json.load(json_file))
 
@@ -11,7 +16,7 @@ class Settings:
 
             # sanitize the setting file by converting everything to str()
             for command in command_names:
-                command_names[command] = str(command_names[command]).strip()
+                command_names[command] = str(command_names[command]).strip().lower()
 
             self.command_names = command_names
 
