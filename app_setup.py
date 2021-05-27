@@ -12,6 +12,7 @@ class Setting:
         with open(setting_file_location, "r") as json_file:
             json_loaded_file = (json.load(json_file))
 
+            # set command names
             command_names = json_loaded_file["command_names"]
 
             # sanitize the setting file by converting everything to str()
@@ -20,13 +21,22 @@ class Setting:
 
             self.command_names = command_names
 
+            # set data fields
             data_fields = json_loaded_file["display_data_fields"]
 
-            # sanitize the setting file by converting everything to str()
             for i in range(0, len(data_fields)):
                 data_fields[i] = str(data_fields[i]).strip()
 
             self.display_data_fields = data_fields
 
-            # sanitize the setting by converting to str()
+            # set table sorting
+            table_sorting = json_loaded_file["table_sorting"]
+
+            for i in range(0, len(table_sorting)):
+                table_sorting[i] = str(table_sorting[i]).strip()
+
+            self.table_sorting = table_sorting
+
+            # set file location
             self.file_location = str(json_loaded_file["file_location"])
+        # automatically closes the file at the end

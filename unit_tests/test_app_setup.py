@@ -20,6 +20,10 @@ class TestAppSetup(unittest.TestCase):
                 "holidays_left",
                 "email"
             ],
+            "table_sorting": [
+                "employee_id",
+                "year"
+            ],
             "file_location": "employee_holidays.csv"
         }
 
@@ -82,6 +86,19 @@ class TestAppSetup(unittest.TestCase):
         self.assertEqual(
             type(expected_setting["display_data_fields"]),
             type(actual_setting.display_data_fields)
+        )
+
+    def test_table_sorting_type_setting(self):
+        # expected results
+        expected_setting = self.expected_setting
+
+        # actual results
+        actual_setting = self.actual_setting
+
+        # comparison
+        self.assertEqual(
+            type(expected_setting["table_sorting"]),
+            type(actual_setting.table_sorting)
         )
 
     def test_file_location_type_setting(self):

@@ -1,42 +1,61 @@
 import os.path
+import operator
 import csv
 
 
 class EmployeeHolidays:
 
-    def __init__(self, file_location):
+    def __init__(self, file_location, table_sorting):
         self.file_location = file_location
 
         # error handling
         assert(os.path.isfile(self.file_location)), "Specified file doesn't exist."
 
         with open(file_location, "r", newline="") as csv_read_employee_holidays:
-            self._set_field_names(csv_read_employee_holidays)
-            self._set_records_and_ids(csv_read_employee_holidays)
+            self._set_field_names(csv_read_employee_holidays, table_sorting)
+            self._set_records_and_ids(csv_read_employee_holidays, table_sorting)
+        # automatically closes the file at the end
 
-    def _set_field_names(self, csv_read_employee_holidays):
+    # following python naming convention, methods with 1 underscore at the start are supposed to be "private" methods
+    def _set_field_names(self, csv_read_employee_holidays, table_sorting):
         fieldnames = csv_read_employee_holidays.readline().split(",")
+
+        # strip spaces around the fieldnames
         for value in range(0, len(fieldnames)):
             fieldnames[value] = fieldnames[value].strip()
+
+        # check if 'id' field exists
+        assert ("id" in fieldnames), "'id' field doesn't exists in the provided csv file"
+
+        # check if the sorting fields exist
+        for field in table_sorting:
+            assert (field in fieldnames), f"{field} field doesn't exists in the provided csv file"
+
         self.fieldnames = fieldnames
         # reset the file to it's original position
         csv_read_employee_holidays.seek(0)
 
-    def _set_records_and_ids(self, csv_read_employee_holidays):
+    def _set_records_and_ids(self, csv_read_employee_holidays, table_sorting):
 
         csv_dictionary_reader = csv.DictReader(csv_read_employee_holidays)
         records = list()
         ids = set()
 
         for record in csv_dictionary_reader:
-            assert("id" in record), "'id' field doesn't exists in the provided csv file"
+            # check if the record contains a numeric value in the id field
+            assert (not record["id"].strip() == ""), "'id' field doesn't contain a value in the provided csv file"
+            assert (record["id"].strip().isnumeric()), \
+                "'id' field doesn't contain a numeric value in the provided csv file"
+
             records.append(record)
             ids.add(record["id"])
 
         assert(len(records) == len(ids)), "There are duplicate ids"
 
-        # sorting the records by their id value
-        self.records = sorted(records, key=lambda record: record["id"])
+        # sorting the records by the setting defined table_sorting
+        records.sort(key=operator.itemgetter(*table_sorting))
+
+        self.records = records
         self.ids = ids
 
     def set_column_widths(self, display_data_fields):

@@ -13,5 +13,9 @@
     "holidays_left",
     "email"
   ],
+  "table_sorting": [
+    "employee_id",
+    "year"
+  ],
   "file_location": "employee_holidays.csv"
 }

@@ -5,7 +5,7 @@ import employee_holidays
 # make sure that this runs only as a main
 if __name__ == "__main__":
     setting = app_setup.Setting("app_settings.json")
-    employee_holidays = employee_holidays.EmployeeHolidays(setting.file_location)
+    employee_holidays = employee_holidays.EmployeeHolidays(setting.file_location, setting.table_sorting)
 
     # text is in a list to make the code more readable
     welcome_section = [
@@ -39,12 +39,14 @@ if __name__ == "__main__":
 
             longest_command = 0
 
+            # assign longest_command
             for line in help_section:
                 # check if line is a list
                 if type(line) == type(help_section):
                     if len(line[0]) > longest_command:
                         longest_command = len(line[0])
 
+            # print out the help_section
             for line in help_section:
                 # check if line is a list
                 if type(line) == type(help_section):
