@@ -17,6 +17,7 @@ class EmployeeHolidays:
         # automatically closes the file at the end
 
     # following python naming convention, methods with 1 underscore at the start are supposed to be "private" methods
+    # not sure whether to call the function _set_field_names or _read_field_names, same with the 1 function below
     def _set_field_names(self, csv_read_employee_holidays, table_sorting):
         fieldnames = csv_read_employee_holidays.readline().split(",")
 
@@ -90,14 +91,18 @@ class EmployeeHolidays:
             return {"exists": True, "id": record_id}
         return {"exists": False, "id": record_id}
 
-    def display_table(self, display_data_fields, display_specific_records=None):
+    def display_table(self, display_data_fields, table_sorting, display_specific_records=None):
 
         # make sure that the display_specific_records list is always empty at the start of the method
         if display_specific_records is None:
             display_specific_records = []
 
         fieldnames = self.fieldnames
+
+        # sorting the records by the setting defined as table_sorting
+        self.records.sort(key=operator.itemgetter(*table_sorting))
         records = self.records
+
         if len(display_specific_records) > 0:
             records = display_specific_records
 
@@ -162,10 +167,12 @@ class EmployeeHolidays:
                 continue
             record[field] = input(f"Please insert value for '{field}' field: ")
 
+        print("New record has been successfully created")
+
         self.records.append(record)
         self.overwrite_file()
 
-    def update_record(self, user_input, command_name):
+    def update_record(self, user_input, command_name, table_sorting):
 
         # check if the record with provided id exists
         result = self.check_record_exists(user_input, command_name)
@@ -180,7 +187,7 @@ class EmployeeHolidays:
         # search for a record with the same id as in the result object, take the 1st time in the list
         original_record = [record for record in records if record["id"] == result["id"]][0].copy()
         record_to_update = original_record.copy()
-        self.display_table(self.fieldnames, [record_to_update])
+        self.display_table(self.fieldnames, table_sorting, [record_to_update])
 
         update_section = [
             "Please insert the name of the field you want to update.",
@@ -202,7 +209,7 @@ class EmployeeHolidays:
                 # overwrite the original record at the specified index
                 self.records[index] = record_to_update
                 self.overwrite_file()
-                self.display_table(self.fieldnames)
+                self.display_table(self.fieldnames, table_sorting)
                 stop_updating = True
 
             elif update_menu_navigation.lower() == "exit":
@@ -213,7 +220,7 @@ class EmployeeHolidays:
 
             elif update_menu_navigation in self.fieldnames:
                 record_to_update[update_menu_navigation] = input(f"{update_menu_navigation}: ")
-                self.display_table(self.fieldnames, [record_to_update])
+                self.display_table(self.fieldnames, table_sorting, [record_to_update])
 
             else:
                 print("Input not recognised, please enter 'exit' to abort the update operation,"

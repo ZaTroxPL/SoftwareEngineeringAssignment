@@ -59,16 +59,16 @@ if __name__ == "__main__":
             print("settings have been reloaded")
 
         elif main_menu_navigation == f"{setting.command_names['display_data']}":
-            employee_holidays.display_table(setting.display_data_fields)
+            employee_holidays.display_table(setting.display_data_fields, setting.table_sorting)
 
         elif main_menu_navigation == f"{setting.command_names['display_all_data']}":
-            employee_holidays.display_table(employee_holidays.fieldnames)
+            employee_holidays.display_table(employee_holidays.fieldnames, setting.table_sorting)
 
         elif main_menu_navigation == f"{setting.command_names['create']}":
             employee_holidays.create_record()
 
         elif main_menu_navigation.startswith(f"{setting.command_names['update']}"):
-            employee_holidays.update_record(main_menu_navigation, setting.command_names['update'])
+            employee_holidays.update_record(main_menu_navigation, setting.command_names['update'], setting.table_sorting)
 
         elif main_menu_navigation.startswith(f"{setting.command_names['delete']}"):
             employee_holidays.delete_confirmation(main_menu_navigation, setting.command_names['delete'])
