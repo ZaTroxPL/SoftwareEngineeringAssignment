@@ -30,7 +30,8 @@ class EmployeeHolidays:
 
         # check if the sorting fields exist
         for field in table_sorting:
-            assert (field in fieldnames), f"{field} field doesn't exists in the provided csv file"
+            assert (field in fieldnames), \
+                f"Sorting by {field} field is impossible because it doesn't exists in the provided csv file"
 
         self.fieldnames = fieldnames
         # reset the file to it's original position
