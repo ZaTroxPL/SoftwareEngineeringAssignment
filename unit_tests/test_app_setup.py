@@ -29,6 +29,13 @@ class TestAppSetup(unittest.TestCase):
 
         self.actual_setting = app_setup.Setting("../app_settings.json")
 
+    def test_command_names_exists(self):
+        # test values
+        setting_file_location = "../unit_tests/test_app_setting_files/no_command_names.json"
+
+        with self.assertRaises(AssertionError):
+            app_setup.Setting(setting_file_location)
+
     def test_command_names_type_setting(self):
         # expected results
         expected_setting = self.expected_setting
@@ -75,6 +82,13 @@ class TestAppSetup(unittest.TestCase):
             type(actual_setting.command_names["delete"])
         )
 
+    def test_display_data_fields_exists(self):
+        # test values
+        setting_file_location = "../unit_tests/test_app_setting_files/no_display_data_fields.json"
+
+        with self.assertRaises(AssertionError):
+            app_setup.Setting(setting_file_location)
+
     def test_display_data_fields_type_setting(self):
         # expected results
         expected_setting = self.expected_setting
@@ -88,6 +102,13 @@ class TestAppSetup(unittest.TestCase):
             type(actual_setting.display_data_fields)
         )
 
+    def test_table_sorting_exists(self):
+        # test values
+        setting_file_location = "../unit_tests/test_app_setting_files/no_table_sorting.json"
+
+        with self.assertRaises(AssertionError):
+            app_setup.Setting(setting_file_location)
+
     def test_table_sorting_type_setting(self):
         # expected results
         expected_setting = self.expected_setting
@@ -100,6 +121,13 @@ class TestAppSetup(unittest.TestCase):
             type(expected_setting["table_sorting"]),
             type(actual_setting.table_sorting)
         )
+
+    def test_file_location_exists(self):
+        # test values
+        setting_file_location = "../unit_tests/test_app_setting_files/no_file_location.json"
+
+        with self.assertRaises(AssertionError):
+            app_setup.Setting(setting_file_location)
 
     def test_file_location_type_setting(self):
         # expected results

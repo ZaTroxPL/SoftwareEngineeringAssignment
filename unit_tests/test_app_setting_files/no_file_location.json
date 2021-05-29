@@ -1,0 +1,20 @@
+{
+  "command_names": {
+    "display_data": "data",
+    "display_all_data": "all data",
+    "create": "create",
+    "update": "update",
+    "delete": "delete"
+  },
+  "display_data_fields": [
+    "id",
+    "year",
+    "first_name",
+    "holidays_left",
+    "email"
+  ],
+  "table_sorting": [
+    "employee_id",
+    "year"
+  ]
+}
