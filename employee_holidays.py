@@ -60,7 +60,11 @@ class EmployeeHolidays:
         self.records = records
         self.ids = ids
 
-    def set_column_widths(self, display_data_fields):
+    def set_column_widths(self, display_data_fields, display_specific_records=None):
+
+        # make sure that the display_specific_records list is set to self.records if empty
+        if display_specific_records is None or len(display_specific_records) == 0:
+            display_specific_records = self.records
 
         # create empty dictionary
         column_widths = dict()
@@ -69,8 +73,8 @@ class EmployeeHolidays:
         for display_field in display_data_fields:
             column_widths[display_field] = len(display_field)
 
-        # for every record in csv file
-        for record in self.records:
+        # for every record in display_specific_records
+        for record in display_specific_records:
             # for every field in a record
             for field in record:
                 # check if the field is one of the selected fields
@@ -119,7 +123,9 @@ class EmployeeHolidays:
                 print(f"field '{field}' couldn't be matched to any existing fields, aborting this operation")
                 return
 
-        self.set_column_widths(display_data_fields)
+        # by passing the display_specific_records var, the column width can be changed based on the records that need
+        # to be displayed
+        self.set_column_widths(display_data_fields, display_specific_records)
         column_widths = self.column_widths
 
         table = []
@@ -168,10 +174,25 @@ class EmployeeHolidays:
                 continue
             record[field] = input(f"Please insert value for '{field}' field: ")
 
-        print("New record has been successfully created")
+        self.display_table(self.fieldnames, ["id"], [record])
 
-        self.records.append(record)
-        self.overwrite_file()
+        # make sure user wants to create the record
+        repeat_confirmation = True
+
+        while repeat_confirmation:
+            remove_confirmation = input(f"Are you sure you want to create this record? (y/n)\n").strip()
+
+            if remove_confirmation == "y":
+                self.records.append(record)
+                self.ids.add(record["id"])
+                self.overwrite_file()
+                print("New record has been successfully created")
+                repeat_confirmation = False
+            elif remove_confirmation == "n":
+                print("Operation aborted")
+                repeat_confirmation = False
+            else:
+                print("command not understood, please enter 'y' for yes and 'n' for no")
 
     def update_record(self, user_input, command_name, table_sorting):
 
@@ -242,7 +263,7 @@ class EmployeeHolidays:
 
         while repeat_confirmation:
             remove_confirmation = input(f"Are you sure you want to remove a record " +
-                                        f"with the id of '{result['id']}'? (y/n)\n")
+                                        f"with the id of '{result['id']}'? (y/n)\n").strip()
 
             if remove_confirmation == "y":
                 # search for a record with the same id as in the result object, take the 1st time in the list
