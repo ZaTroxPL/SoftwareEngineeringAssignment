@@ -1,9 +1,12 @@
 import os.path
 import operator
 import csv
+import copy
+import employee_holiday_record
+from employee_holiday_record_exception import FieldUpdateError
 
 
-class EmployeeHolidays:
+class EmployeeHolidayTable:
 
     def __init__(self, file_location, table_sorting):
         self.file_location = file_location
@@ -17,7 +20,7 @@ class EmployeeHolidays:
         # automatically closes the file at the end
 
     # following python naming convention, methods with 1 underscore at the start are supposed to be "private" methods
-    # not sure whether to call the function _set_field_names or _read_field_names, same with the 1 function below
+    # not sure whether to call the function _set_field_names or _read_field_names
     def _set_field_names(self, csv_read_employee_holidays, table_sorting):
         fieldnames = csv_read_employee_holidays.readline().split(",")
 
@@ -44,18 +47,14 @@ class EmployeeHolidays:
         ids = set()
 
         for record in csv_dictionary_reader:
-            # check if the record contains a numeric value in the id field
-            assert (not record["id"].strip() == ""), "'id' field doesn't contain a value in the provided csv file"
-            assert (record["id"].strip().isnumeric()), \
-                "'id' field doesn't contain a numeric value in the provided csv file"
-
-            records.append(record)
-            ids.add(record["id"])
+            emp_record = employee_holiday_record.EmployeeHolidayRecord(*record.values())
+            records.append(emp_record)
+            ids.add(emp_record.id)
 
         assert(len(records) == len(ids)), "There are duplicate ids"
 
-        # sorting the records by the setting defined table_sorting
-        records.sort(key=operator.itemgetter(*table_sorting))
+        # sorting the records by setting defined, table_sorting
+        records.sort(key=operator.attrgetter(*table_sorting))
 
         self.records = records
         self.ids = ids
@@ -76,11 +75,11 @@ class EmployeeHolidays:
         # for every record in display_specific_records
         for record in display_specific_records:
             # for every field in a record
-            for field in record:
+            for field in self.fieldnames:
                 # check if the field is one of the selected fields
                 for display_field in display_data_fields:
                     if field == display_field:
-                        column_width = len(record[field])
+                        column_width = len(str(record.__getattribute__(field)))
                         # check if new width is bigger than the old one
                         if column_width > column_widths[display_field]:
                             column_widths[display_field] = column_width
@@ -91,6 +90,11 @@ class EmployeeHolidays:
 
         # extract id from the user input
         record_id = str(user_input).split(f"{command_name}")[1].strip()
+
+        if record_id.isnumeric() is False:
+            raise ValueError("provided record_id is not numeric")
+        else:
+            record_id = int(record_id)
 
         if record_id in self.ids:
             return {"exists": True, "id": record_id}
@@ -105,11 +109,11 @@ class EmployeeHolidays:
         fieldnames = self.fieldnames
 
         # sorting the records by the setting defined as table_sorting
-        self.records.sort(key=operator.itemgetter(*table_sorting))
-        records = self.records
+        self.records.sort(key=operator.attrgetter(*table_sorting))
+        records = [record.as_dict() for record in self.records]
 
         if len(display_specific_records) > 0:
-            records = display_specific_records
+            records = [record.as_dict() for record in display_specific_records]
 
         # making sure all provided fields exist
         for field in display_data_fields:
@@ -148,11 +152,11 @@ class EmployeeHolidays:
             # for every selected field
             for display_field in display_data_fields:
                 # for every field in a record
-                for field in record:
+                for field in self.fieldnames:
                     # check if the field is one of the selected fields
                     if field == display_field:
                         # check if value is a number, if so right align, otherwise left align
-                        if record[field].isnumeric():
+                        if str(record[field]).isnumeric():
                             row += f" {record[field]:>{column_widths[display_field]}} |"
                         else:
                             row += f" {record[field]:<{column_widths[display_field]}} |"
@@ -165,14 +169,24 @@ class EmployeeHolidays:
 
     def create_record(self):
 
-        record = dict()
+        record = employee_holiday_record.EmployeeHolidayRecord()
 
         for field in self.fieldnames:
             if field == "id":
                 # making sure that id is unique and that it's a string
-                record[field] = str(int(max(self.ids)) + 1)
+                record.id = int(max(self.ids)) + 1
                 continue
-            record[field] = input(f"Please insert value for '{field}' field: ")
+
+            confirm_input = True
+
+            while confirm_input:
+                try:
+                    record.__setattr__(field, input(f"Please insert value for '{field}' field: "))
+                except FieldUpdateError as error:
+                    print(error.args[0])
+                    print("Please confirm your entry by typing the value again")
+                else:
+                    confirm_input = False
 
         self.display_table(self.fieldnames, ["id"], [record])
 
@@ -184,7 +198,7 @@ class EmployeeHolidays:
 
             if remove_confirmation == "y":
                 self.records.append(record)
-                self.ids.add(record["id"])
+                self.ids.add(record.id)
                 self.overwrite_file()
                 print("New record has been successfully created")
                 repeat_confirmation = False
@@ -207,8 +221,8 @@ class EmployeeHolidays:
         records = self.records.copy()
 
         # search for a record with the same id as in the result object, take the 1st time in the list
-        original_record = [record for record in records if record["id"] == result["id"]][0].copy()
-        record_to_update = original_record.copy()
+        original_record = [record for record in records if record.id == result["id"]][0]
+        record_to_update = copy.deepcopy(original_record)
         self.display_table(self.fieldnames, table_sorting, [record_to_update])
 
         update_section = [
@@ -241,13 +255,22 @@ class EmployeeHolidays:
                 print("You cannot update the 'id' field")
 
             elif update_menu_navigation in self.fieldnames:
-                record_to_update[update_menu_navigation] = input(f"{update_menu_navigation}: ")
+                confirm_input = True
+                while confirm_input:
+                    try:
+                        record_to_update.__setattr__(update_menu_navigation, input(f"{update_menu_navigation}: "))
+                    except FieldUpdateError as error:
+                        print(error.args[0])
+                        print("Please confirm your entry by typing the value again")
+                    else:
+                        confirm_input = False
+
                 self.display_table(self.fieldnames, table_sorting, [record_to_update])
 
             else:
-                print("Input not recognised, please enter 'exit' to abort the update operation,"
-                      " 'done' to save the changes and exit the update operation or"
-                      " enter the name of the field you want to update")
+                print("Input not recognised, please enter 'exit' to abort the update operation, "
+                      "'done' to save the changes and exit the update operation or "
+                      "enter the name of the field you want to update")
 
     def delete_confirmation(self, user_input, command_name):
 
@@ -267,7 +290,7 @@ class EmployeeHolidays:
 
             if remove_confirmation == "y":
                 # search for a record with the same id as in the result object, take the 1st time in the list
-                record = [record for record in self.records if record["id"] == result["id"]][0]
+                record = [record for record in self.records if record.id == result["id"]][0]
                 self.records.remove(record)
                 self.overwrite_file()
                 print("Record removed")
@@ -286,5 +309,7 @@ class EmployeeHolidays:
             # overwrite the file with the headers/fieldnames
             csv_dictionary_writer.writeheader()
 
+            dict_records = [record.as_dict() for record in self.records]
+
             # overwrite the file
-            csv_dictionary_writer.writerows(self.records)
+            csv_dictionary_writer.writerows(dict_records)

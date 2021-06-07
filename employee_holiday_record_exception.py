@@ -1,0 +1,3 @@
+
+class FieldUpdateError(Exception):
+    pass

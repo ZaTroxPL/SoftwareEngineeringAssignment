@@ -1,11 +1,11 @@
 import app_setup
-import employee_holidays
+import employee_holiday_table
 
 
 # make sure that this runs only as a main
 if __name__ == "__main__":
     setting = app_setup.Setting("app_settings.json")
-    employee_holidays = employee_holidays.EmployeeHolidays(setting.file_location, setting.table_sorting)
+    employee_holidays = employee_holiday_table.EmployeeHolidayTable(setting.file_location, setting.table_sorting)
 
     # text is in a list to make the code more readable
     welcome_section = [

@@ -1,0 +1,10 @@
+id,year,employee_id,first_name,last_name,yearly_holiday_allowance,leftover_holiday_from_previous_year,holidays_for_this_year,holidays_taken,holidays_left,email
+1,2019,1,Jakub,Panczyszyn,20,0,20,15,5,jakub.panczyszyn.2000@gmail.com
+2,2019,2,Adam,Scott,18,0,18,17,1,adam.scott@sport.com
+3,2019,3,Tom,Toaster,23,0,23,23,0,tom.toaster@test.com
+4,2020,1,Jakub,Panczyszyn,20,5,25,15,10,jakub.panczyszyn.2000@gmail.com
+5,2020,2,Adam,Scott,18,1,19,19,0,adam.scott@sport.com
+6,2020,3,Tom,Toaster,23,0,23,23,0,tom.toaster@test.com
+7,2021,1,Jakub,Panczyszyn,20,10,30,10,20,jakub.panczyszyn.2000@gmail.com
+8,2021,2,Adam,Scott,18,0,18,18,12,adam.scott@sport.com
+9,2021,3,Tom,Toaster,23,0,23,13,10,tom.toaster@test.com
