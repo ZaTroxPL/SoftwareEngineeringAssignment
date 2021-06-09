@@ -71,7 +71,7 @@ class TestEmployeeHolidayTable(unittest.TestCase):
         storage_file_location = "test_employee_holidays_csv_files/check_record_exists.csv"
 
         # expected values
-        expected_return_value = {"exists": True, "id": "1"}
+        expected_return_value = {"exists": True, "id": 1}
 
         # actual values
         emp = employee_holiday_table.EmployeeHolidayTable(storage_file_location, ["id"])
@@ -84,7 +84,7 @@ class TestEmployeeHolidayTable(unittest.TestCase):
         storage_file_location = "test_employee_holidays_csv_files/check_record_exists.csv"
 
         # expected values
-        expected_return_value = {"exists": False, "id": "123"}
+        expected_return_value = {"exists": False, "id": 123}
 
         # actual values
         emp = employee_holiday_table.EmployeeHolidayTable(storage_file_location, ["id"])
