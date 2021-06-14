@@ -1,5 +1,6 @@
 import unittest
 import employee_holiday_table
+from employee_holiday_record_exceptions import FieldUpdateError, NumericFieldError
 
 
 class TestEmployeeHolidayTable(unittest.TestCase):
@@ -29,14 +30,14 @@ class TestEmployeeHolidayTable(unittest.TestCase):
         # test values
         storage_file_location = "test_employee_holidays_csv_files/no_id_value.csv"
 
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(NumericFieldError):
             employee_holiday_table.EmployeeHolidayTable(storage_file_location, ["id"])
 
     def test_non_numeric_id_value(self):
         # test values
         storage_file_location = "test_employee_holidays_csv_files/non_numeric_id_value.csv"
 
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(NumericFieldError):
             employee_holiday_table.EmployeeHolidayTable(storage_file_location, ["id"])
 
     def test_duplicate_ids(self):

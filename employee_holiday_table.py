@@ -3,7 +3,7 @@ import operator
 import csv
 import copy
 import employee_holiday_record
-from employee_holiday_record_exception import FieldUpdateError
+from employee_holiday_record_exceptions import FieldUpdateError, NumericFieldError, RegularExpressionException
 
 
 class EmployeeHolidayTable:
@@ -92,9 +92,9 @@ class EmployeeHolidayTable:
         record_id = str(user_input).split(f"{command_name}")[1].strip()
 
         if record_id.isnumeric() is False:
-            raise ValueError("provided record_id is not numeric")
-        else:
-            record_id = int(record_id)
+            return {"exists": False, "id": record_id}
+
+        record_id = int(record_id)
 
         if record_id in self.ids:
             return {"exists": True, "id": record_id}
@@ -173,27 +173,44 @@ class EmployeeHolidayTable:
 
         for field in self.fieldnames:
             if field == "id":
-                # making sure that id is unique and that it's a string
+                # making sure that id is unique and that it's an int
                 record.id = int(max(self.ids)) + 1
                 continue
+            elif field == "holidays_for_this_year":
+                if record.holidays_for_this_year:
+                    # if this field exists, let the user know it's calculated value
+                    print(f"The value for field 'holidays_for_this_year' has been calculated to be "
+                          f"{record.holidays_for_this_year}")
+                    continue
+            elif field == "holidays_left":
+                if record.holidays_left:
+                    # if this field exists, let the user know it's calculated value
+                    print(f"The value for field 'holidays_left' has been calculated to be {record.holidays_left}")
+                    continue
 
-            confirm_input = True
+            input_value = True
 
-            while confirm_input:
+            while input_value:
                 try:
                     record.__setattr__(field, input(f"Please insert value for '{field}' field: "))
                 except FieldUpdateError as error:
                     print(error.args[0])
                     print("Please confirm your entry by typing the value again")
+                except NumericFieldError as error:
+                    print(error.args[0])
+                    print("Please enter a valid numeric value")
+                except RegularExpressionException as error:
+                    print(error.args[0])
+                    print(f"Please enter a valid {field} value")
                 else:
-                    confirm_input = False
+                    input_value = False
 
         self.display_table(self.fieldnames, ["id"], [record])
 
         # make sure user wants to create the record
-        repeat_confirmation = True
+        confirmation = True
 
-        while repeat_confirmation:
+        while confirmation:
             remove_confirmation = input(f"Are you sure you want to create this record? (y/n)\n").strip()
 
             if remove_confirmation == "y":
@@ -201,10 +218,10 @@ class EmployeeHolidayTable:
                 self.ids.add(record.id)
                 self.overwrite_file()
                 print("New record has been successfully created")
-                repeat_confirmation = False
+                confirmation = False
             elif remove_confirmation == "n":
                 print("Operation aborted")
-                repeat_confirmation = False
+                confirmation = False
             else:
                 print("command not understood, please enter 'y' for yes and 'n' for no")
 
@@ -262,6 +279,12 @@ class EmployeeHolidayTable:
                     except FieldUpdateError as error:
                         print(error.args[0])
                         print("Please confirm your entry by typing the value again")
+                    except NumericFieldError as error:
+                        print(error.args[0])
+                        print("Please enter a valid numeric value")
+                    except RegularExpressionException as error:
+                        print(error.args[0])
+                        print("Please enter a valid email")
                     else:
                         confirm_input = False
 

@@ -1,7 +1,7 @@
 import unittest
 import datetime
 import employee_holiday_record
-from employee_holiday_record_exception import FieldUpdateError
+from employee_holiday_record_exceptions import FieldUpdateError, NumericFieldError
 
 
 class TestEmployeeHolidayRecord(unittest.TestCase):
@@ -15,8 +15,12 @@ class TestEmployeeHolidayRecord(unittest.TestCase):
         fields = emp_record.__dict__.keys()
 
         for field in fields:
-
             value = emp_record.__getattribute__(field)
+
+            if field == "email" and value is None:
+                print("it is none")
+            elif field == "email" and value is not None:
+                print("it is not none")
 
             if field == "_initialisation_finished":
                 self.assertTrue(value)
@@ -135,13 +139,13 @@ class TestEmployeeHolidayRecord(unittest.TestCase):
             self.assertEqual(exception.exception.args[0], "Passed value is of an incompatible type")
 
     def test_int_parser_with_empty_string(self):
-        with self.assertRaises(AssertionError) as exception:
+        with self.assertRaises(NumericFieldError) as exception:
             employee_holiday_record.EmployeeHolidayRecord._parse_input_into_int("")
 
-        self.assertEqual(exception.exception.args[0], "Passed text is empty")
+        self.assertEqual("Passed text is empty.", exception.exception.args[0])
 
     def test_int_parser_with_non_numeric_string(self):
-        with self.assertRaises(AssertionError) as exception:
+        with self.assertRaises(NumericFieldError) as exception:
             employee_holiday_record.EmployeeHolidayRecord._parse_input_into_int("test")
 
         self.assertEqual(exception.exception.args[0], "Passed text doesn't contain a numeric value")

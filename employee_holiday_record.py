@@ -1,5 +1,6 @@
 import datetime
-from employee_holiday_record_exception import FieldUpdateError
+import re
+from employee_holiday_record_exceptions import FieldUpdateError, NumericFieldError, RegularExpressionException
 
 
 class EmployeeHolidayRecord:
@@ -43,8 +44,10 @@ class EmployeeHolidayRecord:
             return None
         elif type(value) == str:
             # check if the passed text contains a numeric value
-            assert (not value.strip() == ""), "Passed text is empty"
-            assert (value.strip().isnumeric()), "Passed text doesn't contain a numeric value"
+            if value.strip() == "":
+                raise NumericFieldError("Passed text is empty.")
+            elif not value.strip().isnumeric():
+                raise NumericFieldError("Passed text doesn't contain a numeric value")
 
         # at this point, only ints and strings that can be converted into an int should be left
         return value
@@ -99,6 +102,7 @@ class EmployeeHolidayRecord:
 
         value = int(value)
 
+        # making sure that those exceptions are not raised when loading records from the csv file
         if self._initialisation_finished:
             # try catch will take care of handling those errors and asking user for confirmation
             if self._previous_field_update != "year" or self._previous_field_update_value != value:
@@ -186,6 +190,13 @@ class EmployeeHolidayRecord:
 
         self._yearly_holiday_allowance = value
 
+        # because leftover_holiday_from_previous_year has not yet been created, we have to skip it during the initialisation
+        if self._initialisation_finished:
+            # check if leftover_holiday_from_previous_year contains a value
+            if type(self.leftover_holiday_from_previous_year) == int:
+                # if it does, automatically calculate the value for holidays_for_this_year
+                self.holidays_for_this_year = self.yearly_holiday_allowance + self.leftover_holiday_from_previous_year
+
     @property
     def leftover_holiday_from_previous_year(self):
         return self._leftover_holiday_from_previous_year
@@ -211,6 +222,11 @@ class EmployeeHolidayRecord:
         assert (value >= 0), "Passed value is below 0"
 
         self._leftover_holiday_from_previous_year = value
+
+        # check if yearly_holiday_allowance contains a value
+        if type(self.yearly_holiday_allowance) == int:
+            # if it does, automatically calculate the value for holidays_for_this_year
+            self.holidays_for_this_year = self.yearly_holiday_allowance + self.leftover_holiday_from_previous_year
 
     @property
     def holidays_for_this_year(self):
@@ -238,6 +254,13 @@ class EmployeeHolidayRecord:
         assert (value >= 0), "Passed value is below 0"
         self._holidays_for_this_year = value
 
+        # because holidays_taken has not yet been created, we have to skip it during the initialisation
+        if self._initialisation_finished:
+            # check if holidays_taken contains a value
+            if type(self.holidays_taken) == int:
+                # if it does, automatically calculate the value for holidays_left
+                self.holidays_left = self.holidays_for_this_year - self.holidays_taken
+
     @property
     def holidays_taken(self):
         return self._holidays_taken
@@ -261,7 +284,13 @@ class EmployeeHolidayRecord:
                     raise FieldUpdateError("Passed value is above holidays_for_this_year")
 
         assert (value >= 0), "Passed value is below 0"
+
         self._holidays_taken = value
+
+        # check if holidays_taken contains a value
+        if type(self.holidays_for_this_year) == int:
+            # if it does, automatically calculate the value for holidays_left
+            self.holidays_left = self.holidays_for_this_year - self.holidays_taken
 
     @property
     def holidays_left(self):
@@ -302,4 +331,9 @@ class EmployeeHolidayRecord:
         if value is None:
             self._email = None
         else:
+            if self._initialisation_finished:
+                match = re.search(r"^.+@.+\..+$", value)
+                if match is None:
+                    raise RegularExpressionException("Passed value is not in an email format")
+
             self._email = str(value)
