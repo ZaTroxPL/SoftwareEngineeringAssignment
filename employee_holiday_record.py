@@ -83,8 +83,6 @@ class EmployeeHolidayRecord:
 
         value = int(value)
 
-        assert (value >= 0), "Passed value is below 0"
-
         self._id = value
 
     @property
@@ -186,8 +184,6 @@ class EmployeeHolidayRecord:
                 elif value > 30:
                     raise FieldUpdateError("Passed value is above 30")
 
-        assert (value >= 0), "Passed value is below 0"
-
         self._yearly_holiday_allowance = value
 
         # because leftover_holiday_from_previous_year has not yet been created, we have to skip it during the initialisation
@@ -219,8 +215,6 @@ class EmployeeHolidayRecord:
                 if value > self.yearly_holiday_allowance:
                     raise FieldUpdateError("Passed value is above yearly_holiday_allowance")
 
-        assert (value >= 0), "Passed value is below 0"
-
         self._leftover_holiday_from_previous_year = value
 
         # check if yearly_holiday_allowance contains a value
@@ -250,8 +244,6 @@ class EmployeeHolidayRecord:
                 if value != (self.yearly_holiday_allowance + self.leftover_holiday_from_previous_year):
                     raise FieldUpdateError("Passed value is not equal to the sum of \"yearly_holiday_allowance\" and "
                                            "\"leftover_holiday_from_previous_year\" fields")
-
-        assert (value >= 0), "Passed value is below 0"
         self._holidays_for_this_year = value
 
         # because holidays_taken has not yet been created, we have to skip it during the initialisation
@@ -282,8 +274,6 @@ class EmployeeHolidayRecord:
                 self._set_previous_field_update("holidays_taken", value)
                 if value > self.holidays_for_this_year:
                     raise FieldUpdateError("Passed value is above holidays_for_this_year")
-
-        assert (value >= 0), "Passed value is below 0"
 
         self._holidays_taken = value
 
@@ -317,8 +307,6 @@ class EmployeeHolidayRecord:
                 elif value < (self.holidays_for_this_year - self.holidays_taken):
                     raise FieldUpdateError("Passed value is below the difference between \"holidays_for_this_year\" "
                                            "and \"holidays_taken\"")
-
-        assert (value >= 0), "Passed value is below 0"
         self._holidays_left = value
 
     @property
